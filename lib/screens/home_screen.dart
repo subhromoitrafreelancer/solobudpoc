@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/utils/constants.dart';
 import 'package:flutter_app/services/location_service.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter_app/screens/map_screen.dart';
+import 'package:geolocator/geolocator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -74,9 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Explore tab
           _buildExploreTab(),
           // Chat tab
-          const Center(
-            child: Text('Chat Screen'),
-          ),
+          const ChatListScreen(),
           // Meetups tab
           const Center(
             child: Text('Meetups Screen'),
@@ -176,154 +174,28 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: _buildFeatureCard(
                   icon: Icons.map,
-                  title: 'Map View',
-                  description: 'See users on a map',
-                  onTap: () {
-                    Navigator.of(context).pushNamed('/map');
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildFeatureCard(
-                  icon: Icons.event,
-                  title: 'Meetups',
-                  description: 'Join local events',
-                  onTap: () {
-                    context.showSnackBar('Meetups feature coming soon!');
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildFeatureCard(
-                  icon: Icons.forum,
-                  title: 'Forums',
-                  description: 'Discuss travel topics',
-                  onTap: () {
-                    context.showSnackBar('Forums feature coming soon!');
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          
-          // Tips section
-          Text(
-            'Travel Tips',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Safety First',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Always meet in public places and let someone know your plans when meeting new travel buddies.',
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Local Customs',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Research local customs and traditions before traveling to a new destination.',
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildExploreTab() {
-    return Column(
-      children: [
-        Expanded(
-          child: Navigator(
-            onGenerateRoute: (settings) {
-              return MaterialPageRoute(
-                builder: (context) => const MapScreen(),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
+```dart file="lib/utils/constants.dart"
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-  Widget _buildFeatureCard({
-    required IconData icon,
-    required String title,
-    required String description,
-    required VoidCallback onTap,
+final supabase = Supabase.instance.client;
+final LocalDatabaseService _localDb = LocalDatabaseService();
+
+extension ShowSnackBar on BuildContext {
+  void showSnackBar(
+    String message, {
+    bool isError = false,
+    Duration duration = const Duration(seconds: 4),
   }) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: isError ? Colors.red : null,
+      duration: duration,
+    ));
+  }
+
+  void showErrorSnackBar(String message) {
+    showSnackBar(message, isError: true);
   }
 }
